@@ -1,0 +1,281 @@
+.poll-creation {
+  min-height: 100vh;
+  background-color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.poll-creation .logo-container {
+  display: flex;
+  justify-content: flex-start;
+  padding: 40px 60px 40px 60px;
+}
+
+.poll-creation .content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 60px;
+}
+
+.poll-creation .main-title {
+  font-size: 48px;
+  font-weight: 400;
+  color: #000000;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.poll-creation .subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin-bottom: 60px;
+  line-height: 1.5;
+  max-width: 600px;
+}
+
+.question-section {
+  margin-bottom: 50px;
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.question-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.timer-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.timer-dropdown select {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 32px 8px 16px;
+  font-size: 14px;
+  color: #374151;
+  appearance: none;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.dropdown-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #6366f1;
+  font-size: 12px;
+}
+
+.question-input-container {
+  position: relative;
+}
+
+.question-input {
+  width: 100%;
+  min-height: 120px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 12px;
+  padding: 20px;
+  font-size: 16px;
+  color: #000000;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.question-input:focus {
+  outline: 2px solid #6366f1;
+  background: #ffffff;
+}
+
+.character-count {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.options-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  margin-bottom: 60px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 24px;
+}
+
+.options-list {
+  margin-bottom: 20px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.option-number {
+  width: 32px;
+  height: 32px;
+  background: #6366f1;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.option-input {
+  flex: 1;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: #000000;
+}
+
+.option-input:focus {
+  outline: 2px solid #6366f1;
+  background: #ffffff;
+}
+
+.remove-option {
+  width: 24px;
+  height: 24px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.add-option-btn {
+  background: transparent;
+  border: 2px dashed #6366f1;
+  color: #6366f1;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-option-btn:hover {
+  background: #f8fafc;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.radio-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #374151;
+}
+
+.radio-option input[type="radio"] {
+  display: none;
+}
+
+.radio-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d1d5db;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom {
+  border-color: #6366f1;
+  background: #6366f1;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+.ask-question-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 16px 48px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  float: right;
+}
+
+.ask-question-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+@media (max-width: 768px) {
+  .options-section {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .poll-creation .content {
+    padding: 0 20px;
+  }
+
+  .poll-creation .logo-container {
+    padding: 40px 20px;
+  }
+
+  .question-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
