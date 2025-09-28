@@ -6,7 +6,10 @@
       "Bash(npm start)",
       "Bash(node server.js)",
       "Bash(curl http://localhost:3001/api/participants)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

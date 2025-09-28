@@ -18,10 +18,17 @@ function App() {
 
   // Navigate students to participation when poll is active and they haven't answered
   useEffect(() => {
-    if (currentPoll && currentPoll.isActive && userType === 'student' &&
-        currentPage === 'studentWaiting') {
-      console.log('Navigating student to active poll')
-      setCurrentPage('studentPoll')
+    if (currentPoll && currentPoll.isActive && userType === 'student') {
+      // Navigate from waiting room to poll participation
+      if (currentPage === 'studentWaiting') {
+        console.log('Navigating student from waiting room to active poll')
+        setCurrentPage('studentPoll')
+      }
+      // Navigate from post-submission waiting to new poll participation
+      else if (currentPage === 'studentPostSubmissionWaiting') {
+        console.log('Navigating student from post-submission to new poll')
+        setCurrentPage('studentPoll')
+      }
     }
   }, [currentPoll, userType, currentPage])
 

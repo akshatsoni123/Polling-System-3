@@ -220,15 +220,10 @@ const StudentPostSubmissionWaitingStyles = () => (
 
 function StudentPostSubmissionWaiting() {
   const [isChatOpen, setChatOpen] = useState(false);
-  const [pollResults, setPollResults] = useState(null);
-  const { currentPoll } = usePoll();
+  const { currentPoll, pollResults } = usePoll();
 
-  // Calculate poll results from current poll data
-  useEffect(() => {
-    if (currentPoll && currentPoll.results) {
-      setPollResults(currentPoll.results);
-    }
-  }, [currentPoll]);
+  console.log('StudentPostSubmissionWaiting - pollResults:', pollResults);
+  console.log('StudentPostSubmissionWaiting - currentPoll:', currentPoll);
 
   return (
     <>
@@ -236,7 +231,7 @@ function StudentPostSubmissionWaiting() {
       <div className="student-post-submission-container">
         <div className="main-content">
             <div className="header-section">
-                <h2 className="page-title">Question 1</h2>
+                <h2 className="page-title">Question {currentPoll?.questionNumber || 1}</h2>
                 <div className="timer-container">
                     <svg className="timer-icon" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M14 11.2222V6.77778C14 3.58985 11.3137 1 8 1C4.68629 1 2 3.58985 2 6.77778V11.2222C2 14.4101 4.68629 17 8 17C11.3137 17 14 14.4101 14 11.2222Z" stroke="black" strokeWidth="2"/>
@@ -252,9 +247,9 @@ function StudentPostSubmissionWaiting() {
                 <div className="question-header">{currentPoll?.question || 'No question available'}</div>
                 <div className="options-container">
                     {currentPoll?.options?.map((option, idx) => {
-                        const percentage = pollResults?.options?.[option] ?
-                            Math.round((pollResults.options[option] / pollResults.totalResponses) * 100) : 0;
                         const votes = pollResults?.options?.[option] || 0;
+                        const totalResponses = pollResults?.totalResponses || 0;
+                        const percentage = totalResponses > 0 ? Math.round((votes / totalResponses) * 100) : 0;
                         const maxVotes = pollResults?.options ? Math.max(...Object.values(pollResults.options)) : 0;
                         const isHighest = votes > 0 && votes === maxVotes;
 

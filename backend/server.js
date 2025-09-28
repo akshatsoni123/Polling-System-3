@@ -25,6 +25,7 @@ let pollHistory = [];
 let connectedStudents = new Map(); // studentId -> {name, socketId, hasAnswered, answer}
 let connectedTeachers = new Set();
 let chatMessages = []; // Array to store chat messages
+let questionCounter = 0; // Track question numbers
 
 // Routes
 app.get('/api/health', (req, res) => {
@@ -69,6 +70,17 @@ io.on('connection', (socket) => {
         hasAnswered: s.hasAnswered
       }))
     });
+
+    // If there's an active poll with results, send them to the teacher
+    if (currentPoll && currentPoll.isActive) {
+      const results = calculatePollResults();
+      if (results.totalResponses > 0) {
+        socket.emit('poll_results_updated', {
+          pollId: currentPoll.id,
+          results: results
+        });
+      }
+    }
   });
 
   // Student joins with name - FIXED FOR MULTIPLE STUDENTS
@@ -86,13 +98,21 @@ io.on('connection', (socket) => {
       console.log('Removed duplicate student connection:', existingStudent.name);
     }
 
+    // Check if poll is available (active or within timer window)
+    const isPollAvailable = currentPoll && (
+      currentPoll.isActive ||
+      (Date.now() - currentPoll.startTime) < (currentPoll.timer * 1000)
+    );
+
     connectedStudents.set(studentId, {
       id: studentId,
       name,
       socketId: socket.id,
-      hasAnswered: currentPoll && currentPoll.isActive ? false : true, // If no active poll, mark as answered
+      hasAnswered: isPollAvailable ? false : true, // Only mark as not answered if poll is available
       answer: null
     });
+
+    console.log(`Student ${name} joined. Poll available: ${isPollAvailable}, hasAnswered: ${isPollAvailable ? false : true}`);
 
     socket.studentId = studentId;
     socket.join('students');
@@ -105,11 +125,34 @@ io.on('connection', (socket) => {
       totalStudents: connectedStudents.size
     });
 
-    // Send current poll state to the new student (only if poll is active)
+    // Send current poll state to the new student
+    const student = connectedStudents.get(studentId);
+
     socket.emit('current_poll_state', {
-      poll: currentPoll && currentPoll.isActive ? currentPoll : null,
-      canAnswer: currentPoll && currentPoll.isActive && !connectedStudents.get(studentId)?.hasAnswered
+      poll: isPollAvailable ? currentPoll : null,
+      canAnswer: isPollAvailable && !student?.hasAnswered,
+      students: Array.from(connectedStudents.values()).map(s => ({
+        name: s.name,
+        hasAnswered: s.hasAnswered
+      }))
     });
+
+    // If poll was marked inactive but is still within timer window, reactivate it
+    if (currentPoll && !currentPoll.isActive && isPollAvailable) {
+      currentPoll.isActive = true;
+      console.log('Reactivated poll for late-joining student:', name);
+    }
+
+    // If there's an active poll with results, send them too
+    if (currentPoll && currentPoll.isActive) {
+      const results = calculatePollResults();
+      if (results.totalResponses > 0) {
+        socket.emit('poll_results_updated', {
+          pollId: currentPoll.id,
+          results: results
+        });
+      }
+    }
   });
 
   // Teacher creates a new poll - FIXED FOR EARLY STUDENT JOINS
@@ -140,9 +183,13 @@ io.on('connection', (socket) => {
       console.log('Poll saved to history:', currentPoll.question);
     }
 
+    // Increment question counter for new poll
+    questionCounter++;
+
     // Create new poll
     currentPoll = {
       id: uuidv4(),
+      questionNumber: questionCounter,
       question,
       options,
       timer: parseInt(timer.split(' ')[0]), // Extract number from "60 seconds"
@@ -187,9 +234,15 @@ io.on('connection', (socket) => {
     const { answer } = data;
     const studentId = socket.studentId;
 
-    if (!currentPoll || !studentId || !connectedStudents.has(studentId)) {
+    // Check if poll is still available (active or within timer window)
+    const isPollAvailable = currentPoll && (
+      currentPoll.isActive ||
+      (Date.now() - currentPoll.startTime) < (currentPoll.timer * 1000)
+    );
+
+    if (!isPollAvailable || !studentId || !connectedStudents.has(studentId)) {
       socket.emit('answer_submission_error', {
-        message: 'Invalid submission'
+        message: 'Invalid submission or poll not available'
       });
       return;
     }
@@ -208,8 +261,23 @@ io.on('connection', (socket) => {
 
     console.log(`Student ${student.name} answered:`, answer);
 
+    // Calculate updated results
+    const results = calculatePollResults();
+
     // Notify student of successful submission
     socket.emit('answer_submitted_successfully');
+
+    // Send updated poll results to ALL students (for real-time percentage display)
+    io.to('students').emit('poll_results_updated', {
+      pollId: currentPoll.id,
+      results: results
+    });
+
+    // Also send to teachers for their dashboard
+    io.to('teachers').emit('poll_results_updated', {
+      pollId: currentPoll.id,
+      results: results
+    });
 
     // Notify teachers about the answer
     io.to('teachers').emit('student_answered', {
@@ -222,7 +290,9 @@ io.on('connection', (socket) => {
     const allStudentsAnswered = Array.from(connectedStudents.values())
       .every(s => s.hasAnswered);
 
-    if (allStudentsAnswered) {
+    // Only finalize poll if there's more than one student OR if it's been running for a while
+    // This prevents premature finalization when only one student has joined
+    if (allStudentsAnswered && connectedStudents.size > 1) {
       finalizePoll();
     }
   });
@@ -373,6 +443,19 @@ function finalizePoll() {
   const results = calculatePollResults();
 
   console.log('Poll finalized:', currentPoll.question, results);
+
+  // Send final results to all connected clients
+  io.to('students').emit('poll_results_final', {
+    pollId: currentPoll.id,
+    results: results,
+    poll: currentPoll
+  });
+
+  io.to('teachers').emit('poll_results_final', {
+    pollId: currentPoll.id,
+    results: results,
+    poll: currentPoll
+  });
 
   // Save to history when finalizing
   if (!pollHistory.find(p => p.id === currentPoll.id)) {

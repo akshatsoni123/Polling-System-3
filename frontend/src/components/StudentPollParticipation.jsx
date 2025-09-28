@@ -263,7 +263,7 @@ function StudentPollParticipation({ onNavigateToResults }) {
       <div className="student-poll-container">
         <div className="main-content">
             <div className="header-section">
-                <h2 className="page-title">Question 1</h2>
+                <h2 className="page-title">Question {currentPoll?.questionNumber || 1}</h2>
                 <div className="timer-container">
                     <svg className="timer-icon" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M14 11.2222V6.77778C14 3.58985 11.3137 1 8 1C4.68629 1 2 3.58985 2 6.77778V11.2222C2 14.4101 4.68629 17 8 17C11.3137 17 14 14.4101 14 11.2222Z" stroke="black" strokeWidth="2"/>

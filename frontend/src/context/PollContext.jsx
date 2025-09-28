@@ -22,6 +22,7 @@ export const PollProvider = ({ children }) => {
   const [hasAnswered, setHasAnswered] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [pollHistory, setPollHistory] = useState([]);
+  const [pollResults, setPollResults] = useState(null);
 
   useEffect(() => {
     // Initialize socket connection
@@ -47,6 +48,13 @@ export const PollProvider = ({ children }) => {
       });
 
       socket.on('current_poll_state', (data) => {
+        console.log('PollContext - current_poll_state received:', {
+          poll: data.poll?.question,
+          isActive: data.poll?.isActive,
+          canAnswer: data.canAnswer,
+          userType: userType
+        });
+
         setCurrentPoll(data.poll);
         if (data.students) {
           setConnectedStudents(data.students);
@@ -54,9 +62,12 @@ export const PollProvider = ({ children }) => {
         }
         // Only set hasAnswered if there's an active poll
         if (data.canAnswer !== undefined && data.poll && data.poll.isActive) {
-          setHasAnswered(!data.canAnswer);
+          const newHasAnswered = !data.canAnswer;
+          console.log('PollContext - Setting hasAnswered to:', newHasAnswered);
+          setHasAnswered(newHasAnswered);
         } else if (!data.poll || !data.poll.isActive) {
           // If no active poll, student hasn't answered anything yet
+          console.log('PollContext - No active poll, setting hasAnswered to false');
           setHasAnswered(false);
         }
       });
@@ -96,6 +107,25 @@ export const PollProvider = ({ children }) => {
 
       socket.on('answer_submitted_successfully', () => {
         setHasAnswered(true);
+      });
+
+      socket.on('poll_results_updated', (data) => {
+        console.log('PollContext - Poll results updated:', data);
+        console.log('PollContext - Current user type:', userType);
+        console.log('PollContext - Current poll ID:', currentPoll?.id);
+        if (data.pollId === currentPoll?.id) {
+          setPollResults(data.results);
+          // Also update the current poll with results
+          setCurrentPoll(prev => prev ? { ...prev, results: data.results } : null);
+        }
+      });
+
+      socket.on('poll_results_final', (data) => {
+        console.log('PollContext - Poll results final:', data);
+        console.log('PollContext - Current user type:', userType);
+        setPollResults(data.results);
+        // Update current poll with final results and mark as inactive
+        setCurrentPoll(prev => prev ? { ...prev, results: data.results, isActive: false } : null);
       });
 
       socket.on('student_removed', () => {
@@ -169,6 +199,7 @@ export const PollProvider = ({ children }) => {
     hasAnswered,
     timeLeft,
     pollHistory,
+    pollResults,
 
     // Actions
     joinAsTeacher,

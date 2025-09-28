@@ -215,11 +215,11 @@ const LivePollingStyles = () => (
 
 
 function LivePolling({ onNavigateToPollHistory, onNavigateToNewQuestion }) {
-  const { currentPoll, totalStudents, endPollEarly, removeStudent } = usePoll();
+  const { currentPoll, totalStudents, endPollEarly, removeStudent, pollResults } = usePoll();
   const [isChatOpen, setChatOpen] = useState(false);
   const [studentsAnswered, setStudentsAnswered] = useState(0);
 
-  // Listen for real-time student answers
+  // Listen for real-time student answers and poll results
   useEffect(() => {
     const socket = window.socketService?.getSocket();
     if (socket) {
@@ -228,21 +228,49 @@ function LivePolling({ onNavigateToPollHistory, onNavigateToNewQuestion }) {
         console.log(`${data.studentName} answered. ${data.totalAnswered}/${data.totalStudents} completed`);
       };
 
+      const handlePollResultsUpdated = (data) => {
+        console.log('Teacher received poll results update:', data);
+        // Results are already handled by PollContext, just log for debugging
+      };
+
+      const handlePollResultsFinal = (data) => {
+        console.log('Teacher received final poll results:', data);
+        // Results are already handled by PollContext, just log for debugging
+      };
+
       socket.on('student_answered', handleStudentAnswered);
+      socket.on('poll_results_updated', handlePollResultsUpdated);
+      socket.on('poll_results_final', handlePollResultsFinal);
 
       return () => {
         socket.off('student_answered', handleStudentAnswered);
+        socket.off('poll_results_updated', handlePollResultsUpdated);
+        socket.off('poll_results_final', handlePollResultsFinal);
       };
     }
   }, []);
 
-  // Calculate vote percentages for display
+  // Calculate vote percentages for display using real poll results
   const calculateResults = () => {
-    return currentPoll?.options?.map(option => ({
-      text: option,
-      votes: 0,
-      percentage: 0
-    })) || [];
+    if (!currentPoll?.options || !pollResults) {
+      return currentPoll?.options?.map(option => ({
+        text: option,
+        votes: 0,
+        percentage: 0
+      })) || [];
+    }
+
+    const totalResponses = pollResults.totalResponses || 0;
+
+    return currentPoll.options.map(option => {
+      const votes = pollResults.options?.[option] || 0;
+      const percentage = totalResponses > 0 ? Math.round((votes / totalResponses) * 100) : 0;
+      return {
+        text: option,
+        votes,
+        percentage
+      };
+    });
   };
 
   const handleViewPollHistory = () => {
@@ -269,28 +297,35 @@ function LivePolling({ onNavigateToPollHistory, onNavigateToNewQuestion }) {
             <span>View Poll history</span>
         </button>
         <div className="main-content">
-          <h2 className="page-title">Question</h2>
+          <h2 className="page-title">Question {currentPoll?.questionNumber || ''}</h2>
           {currentPoll ? (
             <div className="poll-card">
               <div className="question-header">{currentPoll.question}</div>
               <div className="options-container">
                 {calculateResults().map((option, index) => {
+                  const results = calculateResults();
+                  const maxVotes = Math.max(...results.map(r => r.votes));
+                  const isHighest = option.votes > 0 && option.votes === maxVotes;
+
                   return (
-                    <div key={index} className="option-bar">
+                    <div key={index} className={`option-bar ${isHighest ? 'highlight' : ''}`}>
                       <div className="progress-bar" style={{ width: `${option.percentage}%` }}></div>
                       <div className="option-content">
                           <div className="option-number">{index + 1}</div>
                           <span className="option-text">{option.text}</span>
                       </div>
-                      <span className="option-percentage">{option.percentage}%</span>
+                      <span className="option-percentage">{option.percentage}% ({option.votes} votes)</span>
                     </div>
                   );
                 })}
               </div>
               {currentPoll && (
                 <div style={{ padding: '16px', borderTop: '1px solid #e0e0e0', fontSize: '14px', color: '#666' }}>
-                  <p>Students answered: {studentsAnswered} / {totalStudents}</p>
+                  <p>Students answered: {pollResults?.totalResponses || 0} / {totalStudents}</p>
                   <p>Poll status: {currentPoll.isActive ? 'Active' : 'Completed'}</p>
+                  {pollResults && pollResults.totalResponses > 0 && (
+                    <p>Total votes: {pollResults.totalResponses}</p>
+                  )}
                 </div>
               )}
             </div>
