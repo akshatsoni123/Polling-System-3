@@ -6,63 +6,69 @@
 
 .app {
   min-height: 100vh;
-  background-color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background-color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
 .logo-container {
   display: flex;
   justify-content: center;
-  padding: 40px 0 60px 0;
+  padding: 80px 0 80px 0;
 }
 
 .logo {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #7c3aed;
   color: white;
-  padding: 12px 24px;
-  border-radius: 25px;
+  padding: 8px 20px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  font-weight: 600;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
 }
 
 .logo-icon {
-  font-size: 18px;
+  font-size: 14px;
 }
 
 .content {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 40px;
   text-align: center;
 }
 
 .main-title {
-  font-size: 48px;
+  font-size: 56px;
   font-weight: 400;
-  color: #000000;
-  margin-bottom: 24px;
-  line-height: 1.2;
+  color: #1f2937;
+  margin-bottom: 20px;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
 }
 
 .highlight {
   font-weight: 700;
-  color: #000000;
+  color: #1f2937;
 }
 
 .subtitle {
   font-size: 18px;
-  color: #6b7280;
-  margin-bottom: 60px;
-  line-height: 1.5;
+  color: #9ca3af;
+  margin-bottom: 80px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 80px;
 }
 
 .role-cards {
   display: flex;
-  gap: 24px;
-  margin-bottom: 60px;
+  gap: 40px;
+  margin-bottom: 80px;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -70,55 +76,58 @@
 .role-card {
   background: #ffffff;
   border: 2px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 32px;
-  width: 320px;
+  border-radius: 12px;
+  padding: 40px 32px;
+  width: 380px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .role-card:hover {
   border-color: #d1d5db;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .role-card.selected {
-  border-color: #6366f1;
+  border-color: #7c3aed;
   background: #ffffff;
-  box-shadow: 0 0 0 1px #6366f1;
+  box-shadow: 0 0 0 1px #7c3aed, 0 4px 12px rgba(124, 58, 237, 0.15);
 }
 
 .role-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
-  color: #000000;
-  margin-bottom: 12px;
+  color: #1f2937;
+  margin-bottom: 16px;
 }
 
 .role-description {
-  font-size: 16px;
+  font-size: 15px;
   color: #6b7280;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .continue-btn {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #7c3aed;
   color: white;
   border: none;
-  border-radius: 25px;
-  padding: 16px 48px;
-  font-size: 18px;
-  font-weight: 600;
+  border-radius: 30px;
+  padding: 16px 60px;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 160px;
+  min-width: 180px;
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
 }
 
 .continue-btn:hover:not(:disabled) {
+  background: #6d28d9;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
 
 .continue-btn:disabled {

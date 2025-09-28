@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import './StudentOnboarding.css'
+import { usePoll } from '../context/PollContext'
 
 function StudentOnboarding({ onNavigateToWaitingRoom }) {
-  const [studentName, setStudentName] = useState('Rahul Bajaj')
+  const [studentName, setStudentName] = useState('')
+  const { joinAsStudent } = usePoll()
 
   const handleNameChange = (e) => {
     setStudentName(e.target.value)
@@ -10,8 +12,9 @@ function StudentOnboarding({ onNavigateToWaitingRoom }) {
 
   const handleContinue = () => {
     if (studentName.trim()) {
-      console.log('Student name:', studentName)
-      // Navigate to waiting room first
+      console.log('Student joining as:', studentName.trim())
+      joinAsStudent(studentName.trim())
+      // Navigate to waiting room
       if (onNavigateToWaitingRoom) {
         onNavigateToWaitingRoom()
       }

@@ -1,38 +1,26 @@
 import { useState, useEffect } from 'react'
 import './StudentPostSubmissionWaiting.css'
+import { usePoll } from '../context/PollContext'
+import ChatModal from './ChatModal'
 
 function StudentPostSubmissionWaiting({ onNavigateToNextQuestion }) {
-  const [activeTab, setActiveTab] = useState('Participants')
   const [timeLeft, setTimeLeft] = useState(15)
-  const [chatMessage, setChatMessage] = useState('')
   const [isChatModalOpen, setIsChatModalOpen] = useState(false)
 
-  // Live poll results (updating as other students vote)
-  const [pollResults, setPollResults] = useState({
-    question: "Which planet is known as the Red Planet?",
-    options: [
-      { id: 1, text: "Mars", votes: 12, percentage: 60 },
-      { id: 2, text: "Venus", votes: 2, percentage: 10 },
-      { id: 3, text: "Jupiter", votes: 3, percentage: 15 },
-      { id: 4, text: "Saturn", votes: 3, percentage: 15 }
-    ],
-    totalVotes: 20
-  })
+  const { currentPoll, pollResults, totalStudents } = usePoll()
 
-  // Sample chat messages
-  const [chatMessages] = useState([
-    { id: 1, user: "User 1", message: "Hey There , how can I help?", isOwn: false },
-    { id: 2, user: "User 2", message: "Nothing bro..just chill!", isOwn: true }
-  ])
+  // Get real poll results for display
+  const getDisplayResults = () => {
+    if (!currentPoll || !pollResults) return []
 
-  // Sample participants
-  const participants = [
-    { id: 1, name: "Rahul Arora", status: "online" },
-    { id: 2, name: "Pushpender Rautela", status: "online" },
-    { id: 3, name: "Rijul Zalpuri", status: "online" },
-    { id: 4, name: "Nadeem N", status: "online" },
-    { id: 5, name: "Ashwin Sharma", status: "online" }
-  ]
+    return currentPoll.options.map((option, index) => ({
+      id: index + 1,
+      text: option,
+      votes: pollResults.options[option] || 0,
+      percentage: pollResults.totalResponses > 0 ? ((pollResults.options[option] || 0) / pollResults.totalResponses * 100).toFixed(1) : 0
+    }))
+  }
+
 
   // Timer countdown effect
   useEffect(() => {
@@ -48,30 +36,15 @@ function StudentPostSubmissionWaiting({ onNavigateToNextQuestion }) {
     }
   }, [timeLeft])
 
-  // Simulate live results updating
+  // Navigate to next question when new poll is created
   useEffect(() => {
-    const interval = setInterval(() => {
-      setPollResults(prev => ({
-        ...prev,
-        options: prev.options.map(option => ({
-          ...option,
-          votes: option.votes + Math.floor(Math.random() * 2), // Random vote increases
-          percentage: Math.floor(Math.random() * 30) + (option.id === 1 ? 50 : 5) // Mars stays highest
-        }))
-      }))
-    }, 3000) // Update every 3 seconds
-
-    return () => clearInterval(interval)
-  }, [])
-
-  const handleSendMessage = () => {
-    if (chatMessage.trim()) {
-      console.log('Sending message:', chatMessage)
-      setChatMessage('')
+    if (currentPoll && currentPoll.isActive && onNavigateToNextQuestion) {
+      onNavigateToNextQuestion()
     }
-  }
+  }, [currentPoll, onNavigateToNextQuestion])
 
   const toggleChatModal = () => {
+    console.log('Chat icon clicked, toggling modal:', !isChatModalOpen)
     setIsChatModalOpen(!isChatModalOpen)
   }
 
@@ -93,17 +66,20 @@ function StudentPostSubmissionWaiting({ onNavigateToNextQuestion }) {
         </div>
 
         <div className="question-text">
-          {pollResults.question}
+          {currentPoll?.question || 'Loading question...'}
         </div>
 
         <div className="live-results">
-          {pollResults.options.map((option) => (
+          {getDisplayResults().map((option) => (
             <div key={option.id} className="result-option">
               <div className="option-content">
                 <div className="option-info">
                   <div className="option-number">{option.id}</div>
                   <div className="option-text">{option.text}</div>
                 </div>
+              </div>
+              <div className="vote-count">
+                {option.votes} votes ({option.percentage}%)
               </div>
               <div className="vote-bar">
                 <div
@@ -125,73 +101,10 @@ function StudentPostSubmissionWaiting({ onNavigateToNextQuestion }) {
         💬
       </div>
 
-      {/* Chat Modal */}
-      {isChatModalOpen && (
-        <div className="chat-modal-overlay" onClick={toggleChatModal}>
-          <div className="chat-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-tabs">
-                <button
-                  className={`tab ${activeTab === 'Chat' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('Chat')}
-                >
-                  Chat
-                </button>
-                <button
-                  className={`tab ${activeTab === 'Participants' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('Participants')}
-                >
-                  Participants
-                </button>
-              </div>
-              <button className="close-btn" onClick={toggleChatModal}>
-                ×
-              </button>
-            </div>
-
-            <div className="modal-content">
-              {activeTab === 'Chat' && (
-                <div className="chat-content">
-                  <div className="chat-messages">
-                    {chatMessages.map((msg) => (
-                      <div key={msg.id} className="message-group">
-                        <div className="message-user">{msg.user}</div>
-                        <div className={`message ${msg.isOwn ? 'own-message' : 'other-message'}`}>
-                          {msg.message}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="chat-input">
-                    <input
-                      type="text"
-                      placeholder="Type a message..."
-                      value={chatMessage}
-                      onChange={(e) => setChatMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                    />
-                    <button onClick={handleSendMessage}>Send</button>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'Participants' && (
-                <div className="participants-content">
-                  <div className="participants-header">Name</div>
-                  <div className="participants-list">
-                    {participants.map((participant) => (
-                      <div key={participant.id} className="participant-name-item">
-                        {participant.name}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <ChatModal
+        isOpen={isChatModalOpen}
+        onClose={() => setIsChatModalOpen(false)}
+      />
     </div>
   )
 }

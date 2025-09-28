@@ -1,17 +1,22 @@
 import { useState } from 'react'
 import './PollResults.css'
+import { usePoll } from '../context/PollContext'
+import ChatModal from './ChatModal'
 
 function PollResults({ onNavigateToPollHistory, onNavigateToNewQuestion }) {
-  // Poll results data
-  const pollResults = {
-    question: "Which planet is known as the Red Planet?",
-    options: [
-      { id: 1, text: "Mars", votes: 15, percentage: 75 },
-      { id: 2, text: "Venus", votes: 1, percentage: 5 },
-      { id: 3, text: "Jupiter", votes: 1, percentage: 5 },
-      { id: 4, text: "Saturn", votes: 3, percentage: 15 }
-    ],
-    totalVotes: 20
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false)
+  const { currentPoll, pollResults, totalStudents } = usePoll()
+
+  // Calculate display data
+  const getDisplayResults = () => {
+    if (!currentPoll || !pollResults) return []
+
+    return currentPoll.options.map((option, index) => ({
+      id: index + 1,
+      text: option,
+      votes: pollResults.options[option] || 0,
+      percentage: pollResults.totalResponses > 0 ? ((pollResults.options[option] || 0) / pollResults.totalResponses * 100).toFixed(1) : 0
+    }))
   }
 
   const handleViewPollHistory = () => {
@@ -41,19 +46,23 @@ function PollResults({ onNavigateToPollHistory, onNavigateToNewQuestion }) {
           <h2 className="results-title">Question</h2>
 
           <div className="question-text">
-            {pollResults.question}
+            {currentPoll?.question || 'No poll data available'}
+          </div>
+
+          <div className="poll-summary">
+            <p>Total responses: {pollResults?.totalResponses || 0} / {totalStudents}</p>
           </div>
 
           <div className="results-list">
-            {pollResults.options.map((option) => (
+            {getDisplayResults().map((option) => (
               <div key={option.id} className="result-item">
                 <div className="result-info">
                   <div className="result-option">
                     <div className="option-number">{option.id}</div>
                     <div className="option-text">{option.text}</div>
                   </div>
-                  <div className="result-percentage">
-                    {option.percentage}%
+                  <div className="result-votes">
+                    {option.votes} votes ({option.percentage}%)
                   </div>
                 </div>
                 <div className="result-bar">
@@ -73,9 +82,14 @@ function PollResults({ onNavigateToPollHistory, onNavigateToNewQuestion }) {
       </div>
 
       {/* Chat Icon */}
-      <div className="chat-icon">
+      <div className="chat-icon" onClick={() => setIsChatModalOpen(true)}>
         💬
       </div>
+
+      <ChatModal
+        isOpen={isChatModalOpen}
+        onClose={() => setIsChatModalOpen(false)}
+      />
     </div>
   )
 }

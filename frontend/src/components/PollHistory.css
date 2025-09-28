@@ -163,6 +163,7 @@
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
   transition: all 0.2s ease;
+  z-index: 9999;
 }
 
 .poll-history .chat-icon:hover {
@@ -215,4 +216,56 @@
   .history-content {
     gap: 30px;
   }
+}
+
+/* Loading, Empty, and Error States */
+.loading-state,
+.empty-state,
+.error-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+}
+
+.loading-state p {
+  font-size: 18px;
+  margin: 0;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+.empty-state p:first-child {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.option-stats {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.error-state p:first-child {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+.error-state button {
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.error-state button:hover {
+  background: #5856eb;
 }

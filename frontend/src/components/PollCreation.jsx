@@ -1,11 +1,36 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './PollCreation.css'
+import { usePoll } from '../context/PollContext'
 
 function PollCreation({ onNavigateToLivePolling }) {
-  const [question, setQuestion] = useState('Rahul Bajaj')
+  const [question, setQuestion] = useState('')
   const [timer, setTimer] = useState('60 seconds')
-  const [options, setOptions] = useState(['Rahul Bajaj', 'Rahul Bajaj'])
+  const [options, setOptions] = useState(['', ''])
   const [correctAnswer, setCorrectAnswer] = useState('Yes')
+  const [error, setError] = useState('')
+
+  const { createPoll, currentPoll } = usePoll()
+
+  // Listen for poll creation errors
+  useEffect(() => {
+    const socket = window.socketService?.getSocket()
+    if (socket) {
+      socket.on('poll_creation_error', (errorData) => {
+        setError(errorData.message)
+      })
+
+      return () => {
+        socket.off('poll_creation_error')
+      }
+    }
+  }, [])
+
+  // Navigate to live polling when poll is created
+  useEffect(() => {
+    if (currentPoll && currentPoll.isActive) {
+      onNavigateToLivePolling?.()
+    }
+  }, [currentPoll, onNavigateToLivePolling])
 
   const handleQuestionChange = (e) => {
     setQuestion(e.target.value)
@@ -29,18 +54,29 @@ function PollCreation({ onNavigateToLivePolling }) {
   }
 
   const handleAskQuestion = () => {
+    // Validate form
+    if (!question.trim()) {
+      setError('Please enter a question')
+      return
+    }
+
+    const validOptions = options.filter(opt => opt.trim())
+    if (validOptions.length < 2) {
+      setError('Please provide at least 2 options')
+      return
+    }
+
+    setError('')
+
     const pollData = {
-      question,
+      question: question.trim(),
       timer,
-      options,
+      options: validOptions,
       correctAnswer
     }
-    console.log('Poll data:', pollData)
-    // Here you would send the poll data to your backend
-    // Navigate to live polling interface
-    if (onNavigateToLivePolling) {
-      onNavigateToLivePolling()
-    }
+
+    console.log('Creating poll:', pollData)
+    createPoll(pollData)
   }
 
   return (
@@ -148,6 +184,19 @@ function PollCreation({ onNavigateToLivePolling }) {
             </div>
           </div>
         </div>
+
+        {error && (
+          <div style={{
+            color: '#ef4444',
+            backgroundColor: '#fef2f2',
+            padding: '10px',
+            borderRadius: '6px',
+            marginBottom: '20px',
+            border: '1px solid #fecaca'
+          }}>
+            {error}
+          </div>
+        )}
 
         <button className="ask-question-btn" onClick={handleAskQuestion}>
           Ask Question

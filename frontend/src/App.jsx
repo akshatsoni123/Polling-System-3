@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
+import { usePoll } from './context/PollContext'
 import PollCreation from './components/PollCreation'
 import StudentOnboarding from './components/StudentOnboarding'
 import StudentWaitingRoom from './components/StudentWaitingRoom'
@@ -13,20 +14,66 @@ import PollHistory from './components/PollHistory'
 function App() {
   const [selectedRole, setSelectedRole] = useState('')
   const [currentPage, setCurrentPage] = useState('roleSelection')
+  const [hasJoinedBefore, setHasJoinedBefore] = useState(false)
+  const { joinAsTeacher, joinAsStudent, userType, isConnected, pollResults, currentPoll } = usePoll()
+
+  // Auto-navigate to results when poll is completed (only for teacher, students have their own flow)
+  useEffect(() => {
+    if (pollResults && currentPoll && !currentPoll.isActive && userType === 'teacher') {
+      setCurrentPage('pollResults')
+    }
+  }, [pollResults, currentPoll, userType])
+
+  // Navigate students to participation when poll is active and they haven't answered
+  useEffect(() => {
+    if (currentPoll && currentPoll.isActive && userType === 'student' &&
+        currentPage === 'studentWaiting' && !pollResults) {
+      console.log('Navigating student to active poll')
+      setCurrentPage('studentPoll')
+    }
+  }, [currentPoll, userType, currentPage, pollResults])
+
+  // Navigate students to results when poll is completed (different from teacher results)
+  useEffect(() => {
+    if (pollResults && currentPoll && !currentPoll.isActive && userType === 'student') {
+      setCurrentPage('pollResults')
+    }
+  }, [pollResults, currentPoll, userType])
 
   const handleRoleSelect = (role) => {
     setSelectedRole(role)
   }
 
   const handleContinue = () => {
-    if (selectedRole) {
+    if (selectedRole && isConnected) {
       if (selectedRole === 'teacher') {
+        joinAsTeacher()
         setCurrentPage('pollCreation')
       } else if (selectedRole === 'student') {
         setCurrentPage('studentView')
       }
     }
   }
+
+  // Track when user has actually joined
+  useEffect(() => {
+    if (userType !== null) {
+      setHasJoinedBefore(true)
+    }
+  }, [userType])
+
+  // Listen for when student gets kicked out (only if they were previously connected)
+  useEffect(() => {
+    if (userType === null && hasJoinedBefore && currentPage !== 'roleSelection') {
+      console.log('Student kicked out - navigating to kicked out page')
+      setCurrentPage('kickedOut')
+    }
+  }, [userType, hasJoinedBefore, currentPage])
+
+  // Debug logging
+  useEffect(() => {
+    console.log('App state:', { userType, hasJoinedBefore, currentPage, selectedRole })
+  }, [userType, hasJoinedBefore, currentPage, selectedRole])
 
   const navigateToLivePolling = () => {
     setCurrentPage('livePolling')
@@ -70,10 +117,12 @@ function App() {
   }
 
   if (currentPage === 'studentWaiting') {
+    console.log('Rendering StudentWaitingRoom for user:', userType)
     return <StudentWaitingRoom onNavigateToStudentPoll={navigateToStudentPoll} />
   }
 
   if (currentPage === 'studentPoll') {
+    console.log('Rendering StudentPollParticipation for user:', userType, 'poll:', currentPoll)
     return <StudentPollParticipation onNavigateToResults={navigateToPostSubmissionWaiting} />
   }
 
@@ -139,10 +188,16 @@ function App() {
         <button
           className="continue-btn"
           onClick={handleContinue}
-          disabled={!selectedRole}
+          disabled={!selectedRole || !isConnected}
         >
-          Continue
+          {isConnected ? 'Continue' : 'Connecting...'}
         </button>
+
+        {!isConnected && (
+          <p style={{ color: '#666', fontSize: '14px', marginTop: '10px' }}>
+            Connecting to server...
+          </p>
+        )}
       </div>
     </div>
   )
