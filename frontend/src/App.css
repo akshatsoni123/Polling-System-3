@@ -1,133 +1,141 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap');
+
+/* Reset and base styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+body {
+  font-family: 'Sora', sans-serif;
+  background-color: #FFFFFF;
+  color: #000000;
+}
+
+/* Main application container for centering content */
 .app {
-  min-height: 100vh;
-  background-color: #f8fafc;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-}
-
-.logo-container {
   display: flex;
-  justify-content: center;
-  padding: 80px 0 80px 0;
-}
-
-.logo {
-  background: #7c3aed;
-  color: white;
-  padding: 8px 20px;
-  border-radius: 20px;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  width: 100%;
 }
 
-.logo-icon {
-  font-size: 14px;
-}
-
+/* Wrapper for all page content */
 .content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 40px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem; /* Spacing between elements */
+  width: 100%;
+  max-width: 981px; /* Max width from the design */
 }
 
+/* "Intervue Poll" badge */
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(90deg, #7565D9 0%, #4D0ACD 100%);
+  color: #FFFFFF;
+  padding: 9px 12px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.brand-badge-icon {
+  width: 15px;
+  height: 15px;
+}
+
+/* Main title: "Welcome to the Live Polling System" */
 .main-title {
-  font-size: 56px;
+  font-size: 40px;
   font-weight: 400;
-  color: #1f2937;
-  margin-bottom: 20px;
-  line-height: 1.1;
-  letter-spacing: -0.5px;
+  line-height: 50px;
+  text-align: center;
+  color: #000000;
+  margin-top: 2rem;
 }
 
-.highlight {
-  font-weight: 700;
-  color: #1f2937;
-}
-
+/* Subtitle text */
 .subtitle {
-  font-size: 18px;
-  color: #9ca3af;
-  margin-bottom: 80px;
-  line-height: 1.6;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 80px;
+  font-size: 19px;
+  line-height: 24px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+  max-width: 737px;
+  margin-top: -1rem; /* Adjust spacing */
 }
 
+/* Container for the two role selection cards */
 .role-cards {
   display: flex;
-  gap: 40px;
-  margin-bottom: 80px;
+  flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
   justify-content: center;
-  flex-wrap: wrap;
+  gap: 40px; /* Space between the cards */
+  margin-top: 2.5rem;
 }
 
+/* Individual role card styling */
 .role-card {
-  background: #ffffff;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 40px 32px;
-  width: 380px;
+  box-sizing: border-box;
+  width: 387px;
+  height: 143px;
+  border: 1px solid #D9D9D9;
+  border-radius: 10px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
-.role-card:hover {
-  border-color: #d1d5db;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
+/* Styling for the selected card */
 .role-card.selected {
-  border-color: #7c3aed;
-  background: #ffffff;
-  box-shadow: 0 0 0 1px #7c3aed, 0 4px 12px rgba(124, 58, 237, 0.15);
+  border: 2px solid #7565D9;
+  background-color: rgba(117, 101, 217, 0.05);
 }
 
 .role-title {
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 16px;
+  line-height: 29px;
+  color: #000000;
 }
 
 .role-description {
-  font-size: 15px;
-  color: #6b7280;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 20px;
+  color: #454545;
+  max-width: 326px;
 }
 
+/* "Continue" button styling */
 .continue-btn {
-  background: #7c3aed;
-  color: white;
+  font-family: 'Sora', sans-serif;
+  width: 234px;
+  height: 58px;
+  padding: 17px 70px;
   border: none;
-  border-radius: 30px;
-  padding: 16px 60px;
-  font-size: 16px;
-  font-weight: 500;
+  background: linear-gradient(99.18deg, #8F64E1 -46.89%, #1D68BD 223.45%);
+  border-radius: 34px;
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 180px;
-  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
+  transition: opacity 0.3s ease;
+  margin-top: 2.5rem;
 }
 
 .continue-btn:hover:not(:disabled) {
-  background: #6d28d9;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  opacity: 0.9;
 }
 
 .continue-btn:disabled {

@@ -71,32 +71,22 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Student joins with name - FIXED FOR MULTIPLE STUDENTS
+  // Student joins with name
   socket.on('join_as_student', (data) => {
     const { name } = data;
     const studentId = uuidv4();
-
-    // Check if student with same name already exists (handle reconnections)
-    const existingStudent = Array.from(connectedStudents.values())
-      .find(student => student.name.toLowerCase() === name.toLowerCase());
-
-    if (existingStudent) {
-      // Remove old connection to prevent duplicates
-      connectedStudents.delete(existingStudent.id);
-      console.log('Removed duplicate student connection:', existingStudent.name);
-    }
 
     connectedStudents.set(studentId, {
       id: studentId,
       name,
       socketId: socket.id,
-      hasAnswered: currentPoll && currentPoll.isActive ? false : true, // If no active poll, mark as answered
+      hasAnswered: false,
       answer: null
     });
 
     socket.studentId = studentId;
     socket.join('students');
-    console.log('Student joined:', name, studentId, 'Total students:', connectedStudents.size);
+    console.log('Student joined:', name, studentId);
 
     // Notify teachers about new student
     io.to('teachers').emit('student_joined', {
@@ -111,23 +101,22 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Teacher creates a new poll - FIXED FOR EARLY STUDENT JOINS
+  // Teacher creates a new poll
   socket.on('create_poll', (pollData) => {
     const { question, options, timer, correctAnswer } = pollData;
 
     // Check if teacher can create a new poll
-    // FIXED: Only block if there's an active poll with students who haven't answered
     const allStudentsAnswered = Array.from(connectedStudents.values())
       .every(student => student.hasAnswered);
 
-    if (currentPoll && currentPoll.isActive && connectedStudents.size > 0 && !allStudentsAnswered) {
+    if (currentPoll && !allStudentsAnswered) {
       socket.emit('poll_creation_error', {
         message: 'Cannot create new poll. Not all students have answered the current question.'
       });
       return;
     }
 
-    // Save previous poll to history if exists - FIXED FOR POLL HISTORY
+    // Save previous poll to history if exists
     if (currentPoll) {
       const results = calculatePollResults();
       pollHistory.push({
@@ -135,7 +124,6 @@ io.on('connection', (socket) => {
         results,
         completedAt: new Date().toISOString()
       });
-      console.log('Poll saved to history:', currentPoll.question);
     }
 
     // Create new poll
@@ -161,10 +149,9 @@ io.on('connection', (socket) => {
     // Broadcast new poll to all clients
     io.emit('new_poll_created', currentPoll);
 
-    // Start timer for the poll - FIXED TIMER LOGIC
-    const pollId = currentPoll.id;
+    // Start timer for the poll
     setTimeout(() => {
-      if (currentPoll && currentPoll.id === pollId && currentPoll.isActive) {
+      if (currentPoll && currentPoll.id === currentPoll.id) {
         finalizePoll();
       }
     }, currentPoll.timer * 1000);
@@ -298,7 +285,7 @@ io.on('connection', (socket) => {
     console.log('Chat message from', senderName + ':', message);
   });
 
-  // Handle disconnection - IMPROVED CLEANUP
+  // Handle disconnection
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
 
@@ -318,15 +305,6 @@ io.on('connection', (socket) => {
         studentName: student.name,
         totalStudents: connectedStudents.size
       });
-    }
-
-    // Clean up orphaned students (students whose socket disconnected)
-    for (let [id, student] of connectedStudents) {
-      const studentSocket = io.sockets.sockets.get(student.socketId);
-      if (!studentSocket) {
-        connectedStudents.delete(id);
-        console.log('Cleaned up orphaned student:', student.name);
-      }
     }
   });
 });
@@ -361,16 +339,6 @@ function finalizePoll() {
   const results = calculatePollResults();
 
   console.log('Poll finalized:', currentPoll.question, results);
-
-  // Save to history when finalizing
-  if (!pollHistory.find(p => p.id === currentPoll.id)) {
-    pollHistory.push({
-      ...currentPoll,
-      results,
-      completedAt: new Date().toISOString()
-    });
-    console.log('Poll saved to history on finalize:', currentPoll.question);
-  }
 
   // Broadcast results to all clients
   io.emit('poll_results', {
