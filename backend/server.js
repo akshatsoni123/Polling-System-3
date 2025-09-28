@@ -97,6 +97,7 @@ io.on('connection', (socket) => {
     socket.studentId = studentId;
     socket.join('students');
     console.log('Student joined:', name, studentId, 'Total students:', connectedStudents.size);
+    console.log('Student added to students room. Socket ID:', socket.id);
 
     // Notify teachers about new student
     io.to('teachers').emit('student_joined', {
@@ -121,8 +122,9 @@ io.on('connection', (socket) => {
       .every(student => student.hasAnswered);
 
     if (currentPoll && currentPoll.isActive && connectedStudents.size > 0 && !allStudentsAnswered) {
+      const answeredCount = Array.from(connectedStudents.values()).filter(s => s.hasAnswered).length;
       socket.emit('poll_creation_error', {
-        message: 'Cannot create new poll. Not all students have answered the current question.'
+        message: `Cannot create new poll. ${answeredCount}/${connectedStudents.size} students have answered the current question. Wait for all students to answer or for the timer to expire.`
       });
       return;
     }
@@ -159,7 +161,17 @@ io.on('connection', (socket) => {
     console.log('New poll created:', currentPoll);
 
     // Broadcast new poll to all clients
+    console.log('Broadcasting new poll to all clients:', currentPoll.question);
+    console.log('Connected students:', connectedStudents.size);
+    console.log('Connected teachers:', connectedTeachers.size);
+
+    // Broadcast to everyone
     io.emit('new_poll_created', currentPoll);
+
+    // Also broadcast specifically to students room for redundancy
+    io.to('students').emit('new_poll_created', currentPoll);
+
+    console.log('Poll broadcast completed');
 
     // Start timer for the poll - FIXED TIMER LOGIC
     const pollId = currentPoll.id;
@@ -372,11 +384,6 @@ function finalizePoll() {
     console.log('Poll saved to history on finalize:', currentPoll.question);
   }
 
-  // Broadcast results to all clients
-  io.emit('poll_results', {
-    poll: currentPoll,
-    results
-  });
 }
 
 server.listen(PORT, () => {

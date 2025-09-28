@@ -5,7 +5,8 @@
       "Read(//c/Users/rachi/OneDrive/Pictures/Screenshots/**)",
       "Bash(npm start)",
       "Bash(node server.js)",
-      "Bash(curl http://localhost:3001/api/participants)"
+      "Bash(curl http://localhost:3001/api/participants)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

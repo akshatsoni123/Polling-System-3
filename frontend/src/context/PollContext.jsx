@@ -17,7 +17,6 @@ export const PollProvider = ({ children }) => {
   const [userType, setUserType] = useState(null);
   const [studentName, setStudentName] = useState('');
   const [currentPoll, setCurrentPoll] = useState(null);
-  const [pollResults, setPollResults] = useState(null);
   const [connectedStudents, setConnectedStudents] = useState([]);
   const [totalStudents, setTotalStudents] = useState(0);
   const [hasAnswered, setHasAnswered] = useState(false);
@@ -53,15 +52,19 @@ export const PollProvider = ({ children }) => {
           setConnectedStudents(data.students);
           setTotalStudents(data.students.length);
         }
-        if (data.canAnswer !== undefined) {
+        // Only set hasAnswered if there's an active poll
+        if (data.canAnswer !== undefined && data.poll && data.poll.isActive) {
           setHasAnswered(!data.canAnswer);
+        } else if (!data.poll || !data.poll.isActive) {
+          // If no active poll, student hasn't answered anything yet
+          setHasAnswered(false);
         }
       });
 
       socket.on('new_poll_created', (poll) => {
-        console.log('New poll received:', poll);
+        console.log('PollContext - New poll received:', poll);
+        console.log('User type:', userType);
         setCurrentPoll(poll);
-        setPollResults(null);
         setHasAnswered(false);
         setTimeLeft(poll.timer);
 
@@ -75,15 +78,8 @@ export const PollProvider = ({ children }) => {
             return prev - 1;
           });
         }, 1000);
-
-        return () => clearInterval(timer);
       });
 
-      socket.on('poll_results', (data) => {
-        setPollResults(data.results);
-        setCurrentPoll(data.poll);
-        setTimeLeft(0);
-      });
 
       socket.on('student_joined', (data) => {
         setTotalStudents(data.totalStudents);
@@ -130,7 +126,6 @@ export const PollProvider = ({ children }) => {
     setStudentName(name);
     // Reset student-specific state when joining
     setHasAnswered(false);
-    setPollResults(null);
   };
 
   const createPoll = (pollData) => {
@@ -155,7 +150,6 @@ export const PollProvider = ({ children }) => {
     setUserType(null);
     setStudentName('');
     setCurrentPoll(null);
-    setPollResults(null);
     setConnectedStudents([]);
     setTotalStudents(0);
     setHasAnswered(false);
@@ -170,7 +164,6 @@ export const PollProvider = ({ children }) => {
 
     // Poll state
     currentPoll,
-    pollResults,
     connectedStudents,
     totalStudents,
     hasAnswered,
