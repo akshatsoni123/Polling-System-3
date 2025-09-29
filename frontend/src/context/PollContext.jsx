@@ -105,8 +105,14 @@ export const PollProvider = ({ children }) => {
         console.log(`${data.studentName} answered. ${data.totalAnswered}/${data.totalStudents} completed`);
       });
 
-      socket.on('answer_submitted_successfully', () => {
+      socket.on('answer_submitted_successfully', (data) => {
         setHasAnswered(true);
+        // If poll results are included, set them immediately
+        if (data && data.pollResults) {
+          console.log('PollContext - Poll results received with answer submission:', data.pollResults);
+          setPollResults(data.pollResults);
+          setCurrentPoll(prev => prev ? { ...prev, results: data.pollResults } : null);
+        }
       });
 
       socket.on('poll_results_updated', (data) => {

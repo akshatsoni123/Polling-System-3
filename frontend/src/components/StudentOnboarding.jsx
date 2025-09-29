@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePoll } from '../context/PollContext';
 
 
@@ -114,9 +115,10 @@ const StudentOnboardingStyles = () => (
 );
 
 
-function StudentOnboarding({ onNavigateToWaitingRoom }) {
+function StudentOnboarding() {
   const [studentName, setStudentName] = useState('Rahul Bajaj');
   const { joinAsStudent } = usePoll();
+  const navigate = useNavigate();
 
   const handleNameChange = (e) => {
     setStudentName(e.target.value);
@@ -126,9 +128,7 @@ function StudentOnboarding({ onNavigateToWaitingRoom }) {
     if (studentName.trim()) {
       console.log('Student attempting to join:', studentName.trim());
       joinAsStudent(studentName.trim());
-      if (onNavigateToWaitingRoom) {
-        onNavigateToWaitingRoom();
-      }
+      navigate('/student/waiting');
     }
   };
 

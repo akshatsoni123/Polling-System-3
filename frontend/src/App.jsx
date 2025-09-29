@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import './App.css'
 import { usePoll } from './context/PollContext'
 import PollCreation from './components/PollCreation'
@@ -10,27 +11,11 @@ import KickedOut from './components/KickedOut'
 import LivePolling from './components/LivePolling'
 import PollHistory from './components/PollHistory'
 
-function App() {
+// Role Selection Component
+function RoleSelection() {
   const [selectedRole, setSelectedRole] = useState('')
-  const [currentPage, setCurrentPage] = useState('roleSelection')
-  const [hasJoinedBefore, setHasJoinedBefore] = useState(false)
-  const { joinAsTeacher, joinAsStudent, userType, isConnected, currentPoll } = usePoll()
-
-  // Navigate students to participation when poll is active and they haven't answered
-  useEffect(() => {
-    if (currentPoll && currentPoll.isActive && userType === 'student') {
-      // Navigate from waiting room to poll participation
-      if (currentPage === 'studentWaiting') {
-        console.log('Navigating student from waiting room to active poll')
-        setCurrentPage('studentPoll')
-      }
-      // Navigate from post-submission waiting to new poll participation
-      else if (currentPage === 'studentPostSubmissionWaiting') {
-        console.log('Navigating student from post-submission to new poll')
-        setCurrentPage('studentPoll')
-      }
-    }
-  }, [currentPoll, userType, currentPage])
+  const { joinAsTeacher, isConnected } = usePoll()
+  const navigate = useNavigate()
 
   const handleRoleSelect = (role) => {
     setSelectedRole(role)
@@ -40,106 +25,16 @@ function App() {
     if (selectedRole && isConnected) {
       if (selectedRole === 'teacher') {
         joinAsTeacher()
-        setCurrentPage('pollCreation')
+        navigate('/teacher/create-poll')
       } else if (selectedRole === 'student') {
-        setCurrentPage('studentView')
+        navigate('/student/onboarding')
       }
     }
   }
 
-  // Track when user has actually joined
-  useEffect(() => {
-    if (userType !== null) {
-      setHasJoinedBefore(true)
-    }
-  }, [userType])
-
-  // Listen for when student gets kicked out (only if they were previously connected)
-  useEffect(() => {
-    if (userType === null && hasJoinedBefore && currentPage !== 'roleSelection') {
-      console.log('Student kicked out - navigating to kicked out page')
-      setCurrentPage('kickedOut')
-    }
-  }, [userType, hasJoinedBefore, currentPage])
-
-  // Debug logging
-  useEffect(() => {
-    console.log('App state:', { userType, hasJoinedBefore, currentPage, selectedRole })
-  }, [userType, hasJoinedBefore, currentPage, selectedRole])
-
-  const navigateToLivePolling = () => {
-    setCurrentPage('livePolling')
-  }
-
-  const navigateToWaitingRoom = () => {
-    setCurrentPage('studentWaiting')
-  }
-
-  const navigateToPollHistory = () => {
-    setCurrentPage('pollHistory')
-  }
-
-  const navigateToStudentPoll = () => {
-    setCurrentPage('studentPoll')
-  }
-
-
-  const navigateToNewQuestion = () => {
-    setCurrentPage('pollCreation')
-  }
-
-  const navigateToPostSubmissionWaiting = () => {
-    setCurrentPage('studentPostSubmissionWaiting')
-  }
-
-  const navigateToKickedOut = () => {
-    setCurrentPage('kickedOut')
-  }
-
-  // Render different pages based on current page
-  if (currentPage === 'pollCreation') {
-    return <PollCreation onNavigateToLivePolling={navigateToLivePolling} />
-  }
-
-  if (currentPage === 'studentView') {
-    return <StudentOnboarding onNavigateToWaitingRoom={navigateToWaitingRoom} />
-  }
-
-  if (currentPage === 'studentWaiting') {
-    console.log('Rendering StudentWaitingRoom for user:', userType)
-    return <StudentWaitingRoom onNavigateToStudentPoll={navigateToStudentPoll} />
-  }
-
-  if (currentPage === 'studentPoll') {
-    console.log('Rendering StudentPollParticipation for user:', userType, 'poll:', currentPoll)
-    return <StudentPollParticipation onNavigateToResults={navigateToPostSubmissionWaiting} />
-  }
-
-  if (currentPage === 'studentPostSubmissionWaiting') {
-    return <StudentPostSubmissionWaiting onNavigateToNextQuestion={navigateToStudentPoll} />
-  }
-
-
-  if (currentPage === 'livePolling') {
-    return <LivePolling
-      onNavigateToPollHistory={navigateToPollHistory}
-      onNavigateToNewQuestion={navigateToNewQuestion}
-    />
-  }
-
-  if (currentPage === 'pollHistory') {
-    return <PollHistory />
-  }
-
-  if (currentPage === 'kickedOut') {
-    return <KickedOut />
-  }
-
   return (
     <div className="app">
-      {/* This new 'content' div now wraps everything for easier centering */}
       <div className="content">
-        {/* Replaced the old logo with the new badge design */}
         <div className="brand-badge">
           <svg
             className="brand-badge-icon"
@@ -156,7 +51,6 @@ function App() {
           <span>Intervue Poll</span>
         </div>
 
-        {/* Removed the extra highlight span from the title */}
         <h1 className="main-title">
           Welcome to the Live Polling System
         </h1>
@@ -196,14 +90,65 @@ function App() {
         </button>
 
         {!isConnected && (
-          // Replaced inline style with a class for consistency
           <p className="connecting-text">
             Connecting to server...
           </p>
         )}
       </div>
     </div>
-  );
+  )
+}
+
+function App() {
+  const [hasJoinedBefore, setHasJoinedBefore] = useState(false)
+  const { userType, currentPoll } = usePoll()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  // Navigate students to participation when poll is active and they haven't answered
+  useEffect(() => {
+    if (currentPoll && currentPoll.isActive && userType === 'student') {
+      // Navigate from waiting room to poll participation
+      if (location.pathname === '/student/waiting') {
+        console.log('Navigating student from waiting room to active poll')
+        navigate('/student/poll')
+      }
+      // Navigate from post-submission waiting to new poll participation
+      else if (location.pathname === '/student/waiting-results') {
+        console.log('Navigating student from post-submission to new poll')
+        navigate('/student/poll')
+      }
+    }
+  }, [currentPoll, userType, location.pathname, navigate])
+
+  // Track when user has actually joined
+  useEffect(() => {
+    if (userType !== null) {
+      setHasJoinedBefore(true)
+    }
+  }, [userType])
+
+  // Listen for when student gets kicked out (only if they were previously connected)
+  useEffect(() => {
+    if (userType === null && hasJoinedBefore && location.pathname !== '/') {
+      console.log('Student kicked out - navigating to kicked out page')
+      navigate('/kicked-out')
+    }
+  }, [userType, hasJoinedBefore, location.pathname, navigate])
+
+  return (
+    <Routes>
+      <Route path="/" element={<RoleSelection />} />
+      <Route path="/teacher/create-poll" element={<PollCreation />} />
+      <Route path="/teacher/live-polling" element={<LivePolling />} />
+      <Route path="/teacher/poll-history" element={<PollHistory />} />
+      <Route path="/student/onboarding" element={<StudentOnboarding />} />
+      <Route path="/student/waiting" element={<StudentWaitingRoom />} />
+      <Route path="/student/poll" element={<StudentPollParticipation />} />
+      <Route path="/student/waiting-results" element={<StudentPostSubmissionWaiting />} />
+      <Route path="/kicked-out" element={<KickedOut />} />
+    </Routes>
+  )
 }
 
 export default App

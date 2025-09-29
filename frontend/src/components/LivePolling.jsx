@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePoll } from '../context/PollContext';
 import ChatModal from './ChatModal';
 
@@ -214,8 +215,9 @@ const LivePollingStyles = () => (
 );
 
 
-function LivePolling({ onNavigateToPollHistory, onNavigateToNewQuestion }) {
+function LivePolling() {
   const { currentPoll, totalStudents, endPollEarly, removeStudent, pollResults } = usePoll();
+  const navigate = useNavigate();
   const [isChatOpen, setChatOpen] = useState(false);
   const [studentsAnswered, setStudentsAnswered] = useState(0);
 
@@ -274,15 +276,11 @@ function LivePolling({ onNavigateToPollHistory, onNavigateToNewQuestion }) {
   };
 
   const handleViewPollHistory = () => {
-    if (onNavigateToPollHistory) {
-      onNavigateToPollHistory();
-    }
+    navigate('/teacher/poll-history');
   };
 
   const handleAskNewQuestion = () => {
-    if (onNavigateToNewQuestion) {
-      onNavigateToNewQuestion();
-    }
+    navigate('/teacher/create-poll');
   };
 
   return (

@@ -220,10 +220,40 @@ const StudentPostSubmissionWaitingStyles = () => (
 
 function StudentPostSubmissionWaiting() {
   const [isChatOpen, setChatOpen] = useState(false);
-  const { currentPoll, pollResults } = usePoll();
+  const { currentPoll, pollResults, timeLeft } = usePoll();
 
   console.log('StudentPostSubmissionWaiting - pollResults:', pollResults);
   console.log('StudentPostSubmissionWaiting - currentPoll:', currentPoll);
+  console.log('StudentPostSubmissionWaiting - timeLeft:', timeLeft);
+
+  // Debug: Log detailed poll results data
+  useEffect(() => {
+    console.log('StudentPostSubmissionWaiting - Poll Results Debug:', {
+      pollResults,
+      totalResponses: pollResults?.totalResponses,
+      options: pollResults?.options,
+      currentPollOptions: currentPoll?.options
+    });
+  }, [pollResults, currentPoll]);
+
+  // Force refresh poll results if they're missing
+  useEffect(() => {
+    if (!pollResults && currentPoll) {
+      console.log('StudentPostSubmissionWaiting - Poll results missing, fetching via socket...');
+      const socket = window.socketService?.getSocket();
+      if (socket) {
+        // Request current poll state which should include results
+        socket.emit('get_current_poll_state');
+      }
+    }
+  }, [pollResults, currentPoll]);
+
+  // Format time function (same as in StudentPollParticipation)
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
     <>
@@ -239,7 +269,7 @@ function StudentPostSubmissionWaiting() {
                         <path d="M5 1H11" stroke="black" strokeWidth="2" strokeLinecap="round"/>
                         <path d="M5 19H11" stroke="black" strokeWidth="2" strokeLinecap="round"/>
                     </svg>
-                    <span className="timer-text">{currentPoll?.timer ? `00:${currentPoll.timer.toString().padStart(2, '0')}` : '00:00'}</span>
+                    <span className="timer-text">{formatTime(timeLeft)}</span>
                 </div>
             </div>
             
@@ -249,9 +279,31 @@ function StudentPostSubmissionWaiting() {
                     {currentPoll?.options?.map((option, idx) => {
                         const votes = pollResults?.options?.[option] || 0;
                         const totalResponses = pollResults?.totalResponses || 0;
-                        const percentage = totalResponses > 0 ? Math.round((votes / totalResponses) * 100) : 0;
+
+                        // Enhanced calculation with fallback logic
+                        let percentage = 0;
+                        if (totalResponses > 0) {
+                            percentage = Math.round((votes / totalResponses) * 100);
+                        } else {
+                            // Fallback: if no poll results yet but we're on results page, show loading state
+                            percentage = 0;
+                        }
+
                         const maxVotes = pollResults?.options ? Math.max(...Object.values(pollResults.options)) : 0;
                         const isHighest = votes > 0 && votes === maxVotes;
+
+                        // Debug logging for single student case
+                        if (idx === 0) {
+                            console.log('StudentPostSubmissionWaiting - Option calculation debug:', {
+                                option,
+                                votes,
+                                totalResponses,
+                                percentage,
+                                maxVotes,
+                                isHighest,
+                                pollResultsOptions: pollResults?.options
+                            });
+                        }
 
                         return (
                             <div key={idx} className={`option-bar ${isHighest ? 'highlight' : ''}`}>
@@ -260,7 +312,9 @@ function StudentPostSubmissionWaiting() {
                                     <div className="option-number">{idx + 1}</div>
                                     <span className="option-text">{option}</span>
                                 </div>
-                                <span className="option-percentage">{percentage}%</span>
+                                <span className="option-percentage">
+                                    {pollResults ? `${percentage}%` : 'Loading...'}
+                                </span>
                             </div>
                         );
                     }) || (

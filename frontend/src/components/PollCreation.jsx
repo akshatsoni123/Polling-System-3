@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePoll } from '../context/PollContext';
 
 // Styles are now included within the component to resolve the import error.
@@ -289,7 +290,7 @@ const PollCreationStyles = () => (
 );
 
 
-function PollCreation({ onNavigateToLivePolling }) {
+function PollCreation() {
   const [question, setQuestion] = useState('');
   const [timer, setTimer] = useState(60);
   const [options, setOptions] = useState(['', '']);
@@ -297,6 +298,7 @@ function PollCreation({ onNavigateToLivePolling }) {
   const [error, setError] = useState('');
 
   const { createPoll, currentPoll, isConnected, userType } = usePoll();
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log('PollCreation - Connection status:', isConnected, 'User type:', userType);
@@ -306,9 +308,9 @@ function PollCreation({ onNavigateToLivePolling }) {
     console.log('PollCreation - currentPoll changed:', currentPoll);
     if (currentPoll && currentPoll.isActive) {
       console.log('Poll is active, navigating to live polling');
-      onNavigateToLivePolling?.();
+      navigate('/teacher/live-polling');
     }
-  }, [currentPoll, onNavigateToLivePolling]);
+  }, [currentPoll, navigate]);
 
   useEffect(() => {
     // Listen for poll creation errors

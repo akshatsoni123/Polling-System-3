@@ -264,8 +264,24 @@ io.on('connection', (socket) => {
     // Calculate updated results
     const results = calculatePollResults();
 
-    // Notify student of successful submission
-    socket.emit('answer_submitted_successfully');
+    console.log('Backend - Poll results calculated after student answered:', {
+      results,
+      studentName: student.name,
+      studentAnswer: answer,
+      totalStudents: connectedStudents.size,
+      answeredStudents: Array.from(connectedStudents.values()).filter(s => s.hasAnswered).length
+    });
+
+    // Notify student of successful submission WITH poll results
+    socket.emit('answer_submitted_successfully', {
+      pollResults: results
+    });
+
+    // IMMEDIATELY send poll results to the submitting student
+    socket.emit('poll_results_updated', {
+      pollId: currentPoll.id,
+      results: results
+    });
 
     // Send updated poll results to ALL students (for real-time percentage display)
     io.to('students').emit('poll_results_updated', {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePoll } from '../context/PollContext';
 import ChatModal from './ChatModal';
 
@@ -200,12 +201,13 @@ const StudentPollParticipationStyles = () => (
     `}</style>
 );
 
-function StudentPollParticipation({ onNavigateToResults }) {
+function StudentPollParticipation() {
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [isChatOpen, setChatOpen] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const { currentPoll, submitAnswer, hasAnswered, timeLeft } = usePoll();
+  const navigate = useNavigate();
 
   // Debug logging
   useEffect(() => {
@@ -226,28 +228,29 @@ function StudentPollParticipation({ onNavigateToResults }) {
     }
   }, [timeLeft, hasSubmitted, currentPoll]);
 
-  // Listen for successful submission
+  // Navigate immediately after local submission (don't wait for backend confirmation)
   useEffect(() => {
-    if (hasAnswered && hasSubmitted && currentPoll) {
-      // Navigate to post submission waiting only if there was actually a poll
-      if (onNavigateToResults) {
-        onNavigateToResults();
-      }
+    if (hasSubmitted && selectedAnswer && currentPoll) {
+      // Navigate immediately after user submits, don't wait for backend confirmation
+      console.log('Student submitted answer, navigating to results page immediately');
+      navigate('/student/waiting-results');
     }
-  }, [hasAnswered, hasSubmitted, currentPoll, onNavigateToResults]);
+  }, [hasSubmitted, selectedAnswer, currentPoll, navigate]);
 
   const handleTimeUp = () => {
     if (selectedAnswer && !hasSubmitted) {
       handleSubmit();
-    } else if (onNavigateToResults) {
-      onNavigateToResults();
+    } else {
+      navigate('/student/waiting-results');
     }
   };
 
   const handleSubmit = () => {
     if (selectedAnswer && !hasSubmitted) {
+      console.log('Student clicking submit button, answer:', selectedAnswer);
       setHasSubmitted(true);
       submitAnswer(selectedAnswer);
+      // Navigation will happen via useEffect when hasSubmitted becomes true
     }
   };
 

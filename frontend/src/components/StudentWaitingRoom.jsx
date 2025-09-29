@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePoll } from '../context/PollContext';
 import ChatModal from './ChatModal';
 
@@ -222,19 +223,18 @@ const StudentWaitingRoomStyles = () => (
 );
 
 
-function StudentWaitingRoom({ onNavigateToStudentPoll }) {
+function StudentWaitingRoom() {
     const [isChatOpen, setChatOpen] = useState(false);
     const { currentPoll } = usePoll();
+    const navigate = useNavigate();
 
     useEffect(() => {
         console.log('StudentWaitingRoom - currentPoll:', currentPoll);
         if (currentPoll && currentPoll.isActive) {
             console.log('Poll is active, navigating to student poll');
-            if (onNavigateToStudentPoll) {
-                onNavigateToStudentPoll();
-            }
+            navigate('/student/poll');
         }
-    }, [currentPoll, onNavigateToStudentPoll]);
+    }, [currentPoll, navigate]);
 
 
   return (
