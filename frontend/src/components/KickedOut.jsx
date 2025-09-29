@@ -29,7 +29,7 @@ const KickedOutStyles = () => (
             display: inline-flex;
             align-items: center;
             gap: 7px;
-            background: linear-gradient(90deg, #7565D9 0%, #4D0ACD 100%);
+            background: linear-gradient(90deg, #4A90E2 0%, #2563EB 100%);
             color: #FFFFFF;
             padding: 9px 12px;
             border-radius: 24px;

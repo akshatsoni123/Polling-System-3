@@ -32,7 +32,7 @@ const PollCreationStyles = () => (
             display: inline-flex;
             align-items: center;
             gap: 7px;
-            background: linear-gradient(90deg, #7565D9 0%, #4D0ACD 100%);
+            background: linear-gradient(90deg, #4A90E2 0%, #2563EB 100%);
             color: #FFFFFF;
             padding: 9px 12px;
             border-radius: 24px;
@@ -111,7 +111,7 @@ const PollCreationStyles = () => (
             pointer-events: none;
             width: 19px;
             height: 18px;
-            background-color: #480FB3;
+            background-color: #2563EB;
             clip-path: polygon(50% 100%, 0 0, 100% 0);
         }
 
@@ -133,7 +133,7 @@ const PollCreationStyles = () => (
         }
 
         .question-input:focus {
-            outline: 1px solid #7565D9;
+            outline: 1px solid #4A90E2;
         }
 
         .char-count {
@@ -174,7 +174,7 @@ const PollCreationStyles = () => (
             width: 24px;
             height: 24px;
             border-radius: 22px;
-            background: linear-gradient(243.94deg, #8F64E1 -50.82%, #4E377B 216.33%);
+            background: linear-gradient(243.94deg, #5B9BD5 -50.82%, #2563EB 216.33%);
             color: #FFFFFF;
             display: flex;
             justify-content: center;
@@ -197,12 +197,12 @@ const PollCreationStyles = () => (
         }
 
         .option-input:focus {
-            outline: 1px solid #7565D9;
+            outline: 1px solid #4A90E2;
         }
 
         .add-more-btn {
             background: transparent;
-            border: 1px solid #7451B6;
+            border: 1px solid #4A90E2;
             border-radius: 11px;
             padding: 10px;
             width: 169px;
@@ -210,7 +210,7 @@ const PollCreationStyles = () => (
             font-family: 'Sora', sans-serif;
             font-size: 14px;
             font-weight: 600;
-            color: #7C57C2;
+            color: #5B9BD5;
             cursor: pointer;
             margin-top: 1rem;
         }
@@ -247,14 +247,14 @@ const PollCreationStyles = () => (
 
         .radio-option input:checked + .radio-custom {
             background: #FFFFFF;
-            border: 2px solid #8F64E1;
+            border: 2px solid #5B9BD5;
         }
 
         .radio-option input:checked + .radio-custom .radio-dot {
             width: 14px;
             height: 14px;
             border-radius: 50%;
-            background: #8F64E1;
+            background: #5B9BD5;
         }
 
         .footer {
@@ -271,7 +271,7 @@ const PollCreationStyles = () => (
             height: 58px;
             padding: 17px 70px;
             border: none;
-            background: linear-gradient(99.18deg, #8F64E1 -46.89%, #1D68BD 223.45%);
+            background: linear-gradient(99.18deg, #5B9BD5 -46.89%, #1D68BD 223.45%);
             border-radius: 34px;
             color: #FFFFFF;
             font-size: 18px;

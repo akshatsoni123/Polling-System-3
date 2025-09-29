@@ -34,7 +34,7 @@ const StudentOnboardingStyles = () => (
             display: inline-flex;
             align-items: center;
             gap: 7px;
-            background: linear-gradient(90deg, #7565D9 0%, #4D0ACD 100%);
+            background: linear-gradient(90deg, #4A90E2 0%, #2563EB 100%);
             color: #FFFFFF;
             padding: 9px 12px;
             border-radius: 24px;
@@ -91,14 +91,14 @@ const StudentOnboardingStyles = () => (
         }
 
         .name-input:focus {
-            outline: 1px solid #7565D9;
+            outline: 1px solid #4A90E2;
         }
         
         .continue-btn {
             width: 234px;
             height: 58px;
             border: none;
-            background: linear-gradient(99.18deg, #8F64E1 -46.89%, #1D68BD 223.45%);
+            background: linear-gradient(99.18deg, #5B9BD5 -46.89%, #1D68BD 223.45%);
             border-radius: 34px;
             color: #FFFFFF;
             font-size: 18px;

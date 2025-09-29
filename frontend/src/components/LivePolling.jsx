@@ -24,7 +24,7 @@ const LivePollingStyles = () => (
             position: fixed;
             top: 40px;
             right: 40px;
-            background: linear-gradient(99.18deg, #8F64E1 -46.89%, #1D68BD 223.45%);
+            background: linear-gradient(99.18deg, #5B9BD5 -46.89%, #1D68BD 223.45%);
             color: white;
             border: none;
             border-radius: 34px;
@@ -59,7 +59,7 @@ const LivePollingStyles = () => (
 
         .poll-card {
             width: 100%;
-            border: 1px solid #AF8FF1;
+            border: 1px solid #93C5FD;
             border-radius: 9px;
             overflow: hidden;
         }
@@ -91,7 +91,7 @@ const LivePollingStyles = () => (
         }
 
         .option-bar.highlight {
-            border: 1.5px solid #8F64E1;
+            border: 1.5px solid #5B9BD5;
         }
         
         .progress-bar {
@@ -99,7 +99,7 @@ const LivePollingStyles = () => (
             left: 0;
             top: 0;
             height: 100%;
-            background-color: #6766D5;
+            background-color: #4A90E2;
             border-radius: 5px;
             z-index: 1;
         }
@@ -120,7 +120,7 @@ const LivePollingStyles = () => (
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #6766D5;
+            color: #4A90E2;
             font-size: 11px;
             font-weight: 600;
             flex-shrink: 0;
@@ -144,7 +144,7 @@ const LivePollingStyles = () => (
         }
 
         .new-question-btn {
-            background: linear-gradient(99.18deg, #8F64E1 -46.89%, #1D68BD 223.45%);
+            background: linear-gradient(99.18deg, #5B9BD5 -46.89%, #1D68BD 223.45%);
             border-radius: 34px;
             border: none;
             color: white;
@@ -162,7 +162,7 @@ const LivePollingStyles = () => (
             right: 30px;
             width: 60px;
             height: 60px;
-            background: #5A66D1;
+            background: #3B82F6;
             border-radius: 50%;
             border: none;
             cursor: pointer;
@@ -197,17 +197,17 @@ const LivePollingStyles = () => (
         .tab.active { color: #000; }
         .tab.active::after {
             content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
-            height: 2px; background-color: #7565D9;
+            height: 2px; background-color: #4A90E2;
         }
         .modal-content { padding: 20px; overflow-y: auto; flex-grow: 1; }
         .chat-view { display: flex; flex-direction: column; gap: 15px; }
         .message-container { display: flex; flex-direction: column; }
         .message-container.user-1 { align-items: flex-start; }
         .message-container.user-2 { align-items: flex-end; }
-        .message-user { font-size: 14px; font-weight: 600; color: #7565D9; margin-bottom: 4px; }
+        .message-user { font-size: 14px; font-weight: 600; color: #4A90E2; margin-bottom: 4px; }
         .message-text { padding: 10px 15px; border-radius: 10px; max-width: 80%; margin: 0; }
         .user-1 .message-text { background-color: #3E3E3E; color: white; }
-        .user-2 .message-text { background-color: #7565D9; color: white; }
+        .user-2 .message-text { background-color: #4A90E2; color: white; }
         .participant-header, .participant-name { text-align: left; padding: 10px 0; margin: 0; }
         .participant-header { color: #333; font-weight: normal; border-bottom: 1px solid #E0E0E0; }
         .participant-name { font-weight: 600; }

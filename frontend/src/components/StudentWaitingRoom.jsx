@@ -29,7 +29,7 @@ const StudentWaitingRoomStyles = () => (
             display: inline-flex;
             align-items: center;
             gap: 7px;
-            background: linear-gradient(90deg, #7565D9 0%, #4D0ACD 100%);
+            background: linear-gradient(90deg, #4A90E2 0%, #2563EB 100%);
             color: #FFFFFF;
             padding: 9px 12px;
             border-radius: 24px;
@@ -78,7 +78,7 @@ const StudentWaitingRoomStyles = () => (
             right: 30px;
             width: 60px; 
             height: 60px;
-            background: #5A66D1;
+            background: #3B82F6;
             border-radius: 50%;
             border: none;
             cursor: pointer;
@@ -148,7 +148,7 @@ const StudentWaitingRoomStyles = () => (
             left: 0;
             right: 0;
             height: 2px;
-            background-color: #7565D9;
+            background-color: #4A90E2;
         }
 
         .modal-content {
@@ -180,7 +180,7 @@ const StudentWaitingRoomStyles = () => (
         .message-user {
             font-size: 14px;
             font-weight: 600;
-            color: #7565D9;
+            color: #4A90E2;
             margin-bottom: 4px;
         }
 
@@ -197,7 +197,7 @@ const StudentWaitingRoomStyles = () => (
         }
 
         .user-2 .message-text {
-            background-color: #7565D9;
+            background-color: #4A90E2;
             color: white;
         }
 
