@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import API_CONFIG from '../config/api';
 
 class SocketService {
   constructor() {
@@ -8,7 +9,7 @@ class SocketService {
     this.studentName = null;
   }
 
-  connect(serverUrl = 'http://localhost:3001') {
+  connect(serverUrl = API_CONFIG.BASE_URL) {
     if (this.socket && this.isConnected) {
       return this.socket;
     }

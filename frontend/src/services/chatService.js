@@ -1,4 +1,5 @@
 import socketService from './socketService';
+import API_CONFIG from '../config/api';
 
 class ChatService {
   constructor() {
@@ -44,7 +45,7 @@ class ChatService {
   // Fetch chat history from backend
   async fetchChatHistory() {
     try {
-      const response = await fetch('http://localhost:3001/api/chat/messages');
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CHAT_MESSAGES}`);
       const data = await response.json();
       this.messages = data.messages || [];
       this.notifyListeners();
@@ -56,7 +57,7 @@ class ChatService {
   // Fetch participants list
   async fetchParticipants() {
     try {
-      const response = await fetch('http://localhost:3001/api/participants');
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PARTICIPANTS}`);
       const data = await response.json();
       this.participants = data.participants || [];
       this.notifyListeners();

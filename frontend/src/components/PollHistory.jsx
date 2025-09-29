@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { usePoll } from '../context/PollContext';
 import ChatModal from './ChatModal';
+import API_CONFIG from '../config/api';
 
 // Reusable Poll Card Component
 const PollCard = ({ poll, index }) => {
@@ -269,7 +270,7 @@ function PollHistory() {
     const fetchPollHistory = async () => {
       try {
         console.log('Fetching poll history...');
-        const response = await fetch('http://localhost:3001/api/poll/history');
+        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.POLL_HISTORY}`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
