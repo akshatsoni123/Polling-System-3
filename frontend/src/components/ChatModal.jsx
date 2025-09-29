@@ -189,7 +189,7 @@ function ChatModal({ isOpen, onClose }) {
                       <button
                         onClick={() => handleKickOut(participant.name)}
                         style={{
-                          background: '#ef4444',
+                          background: '#f59e0b',
                           color: 'white',
                           border: 'none',
                           borderRadius: '4px',
